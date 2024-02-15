@@ -9,16 +9,42 @@ from sklearn.decomposition import PCA
 
 from scipy.spatial import distance
 
-def euclidean():
+def euclidean(df:pd.DataFrame, data_cols, n_pcas=30):
     """
-    Generate  euclidean distance score using PCAs of cell measurements
-    returns new column of distances
-    """
-    print("this is a function")
+    Calculate Euclidean distance of n number of PCA columns
+    Args:
+        df (pd.DataFrame): Source data
+        data_cols (list-like): list of relevant measurement columns
+        n_pcas (int, optional): Number of PCAs. Defaults to 30.
 
-def mahalanobis():
+    Returns:
+        list-like: new euclidean distance columns
     """
-    Generate mahalanobis distnace, including inverse covarience matrix
-    returns new column of distances
+    data = StandardScaler().fit_transform(df[data_cols])
+    ar_pcas = PCA(n_components=n_pcas).fit_transform(data)
+    rows, _ = ar_pcas.shape
+    x0 = [0 for i in range(n_pcas)]
+    euclidean_dist = []
+    for i in range(rows):
+        euclidean_dist.append(distance.euclidean(x0, ar_pcas[i]))
+    return euclidean_dist
+        
+
+def mahalanobis(df:pd.DataFrame, data_cols, n_pcas=30):
     """
-    print("do somethings")
+    Calculate Mahalonbis distance of n number of PCA columns
+    Args:
+        df (pd.DataFrame): Souce data
+        data_cols (list-like): list of relevant measurement columns
+        n_pcas (int, optional): number of PCAs. Defaults to 30.
+    """
+    data = StandardScaler().fit_transform(df[data_cols])
+    ar_pcas = PCA(n_components=n_pcas).fit_transform(data)
+    rows, _ = ar_pcas.shape
+    x0 = [0 for i in range(n_pcas)]
+    mahala_dist = []
+    for i in range(rows):
+        iv = [[],[]] ## todo: get inverse variance matrix
+        mahala_dist.append(distance.mahalanobis(x0, ar_pcas[i],iv))
+    
+    return mahala_dist
