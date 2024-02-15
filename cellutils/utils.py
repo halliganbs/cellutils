@@ -45,7 +45,7 @@ def make_well(df:pd.DataFrame, meta_cols, data_cols, id='Image_Metadata_WellID',
         for c in data_cols:
             data[c].append(temp[c].mean())
         data[score].append(temp[score].mean())
-        data['index'] = i
+        data['index'].append(i)
 
     well = pd.DataFrame(data=data)
     print(well.shape)
