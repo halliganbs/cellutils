@@ -1,7 +1,7 @@
 import os
 import re
 
-import numpy as numpy
+import numpy as np
 import pandas as pd
 
 from skelarn.preprocessing import StandardScaler
@@ -39,12 +39,14 @@ def mahalanobis(df:pd.DataFrame, data_cols, n_pcas=30):
         n_pcas (int, optional): number of PCAs. Defaults to 30.
     """
     data = StandardScaler().fit_transform(df[data_cols])
-    ar_pcas = PCA(n_components=n_pcas).fit_transform(data)
-    rows, _ = ar_pcas.shape
+    pcas = PCA(n_components=n_pcas).fit_transform(data)
+    rows, _ = pcas.shape
     x0 = [0 for i in range(n_pcas)]
     mahala_dist = []
     for i in range(rows):
-        iv = [[],[]] ## todo: get inverse variance matrix
-        mahala_dist.append(distance.mahalanobis(x0, ar_pcas[i],iv))
+        cm = np.cov(pcas[i])
+        icm = np.linalg.inv(cm)
+        # todo fix this ^^^
+        mahala_dist.append(distance.mahalanobis(x0, pcas[i],icm))
     
     return mahala_dist
