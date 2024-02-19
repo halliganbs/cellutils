@@ -4,8 +4,18 @@ import re
 import numpy as np
 import pandas as pd
 
-def zpad():
-    print("PAD ZEROS INTO WELL ID")
+def zpad(df:pd.DataFrame, wellid:str):
+    """
+    Fix zpadding in well ids e.g. A1 => A01
+    Args:
+        df (pd.DataFrame): Source Dataframe might change to just list of well ids
+        wellid (str): Well id column name
+
+    Returns:
+        np.Array: fixed well ids in np.Array
+    """
+    wids = df[wellid].values
+    return np.array([f"{w[0]+str(w[1:]).zfill(2)}" for w in wids])
 
 def split_metadata():
     print("split metadata of file name")
