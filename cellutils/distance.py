@@ -4,7 +4,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from skelarn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 from scipy.spatial import distance
