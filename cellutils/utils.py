@@ -47,6 +47,7 @@ def make_well(df:pd.DataFrame, meta_cols, data_cols, id='Image_Metadata_WellID',
     """
     data = {x:[] for x in meta_cols+data_cols}
     data[score] = []
+    data['count'] = []
     data['index'] = []
     for i, wid in enumerate(df[id].unique().tolist()):
         temp = df.loc[df[id]==wid]
@@ -55,6 +56,7 @@ def make_well(df:pd.DataFrame, meta_cols, data_cols, id='Image_Metadata_WellID',
         for c in data_cols:
             data[c].append(temp[c].mean())
         data[score].append(temp[score].mean())
+        data['count'].append(len(temp))
         data['index'].append(i)
 
     well = pd.DataFrame(data=data)
