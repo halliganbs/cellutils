@@ -31,7 +31,7 @@ def zprime(pcs, ncs):
     b = np.abs(pcs.mean()-ncs.mean())
     return 1-(a/b)
 
-def make_well(df:pd.DataFrame, meta_cols, data_cols, id='Image_Metadata_WellID', score='score'):
+def make_well(df:pd.DataFrame, meta_cols, data_cols, well_id='Image_Metadata_WellID', score='score'):
     """
     Convert Cell level scored data into well level means
 
@@ -49,8 +49,8 @@ def make_well(df:pd.DataFrame, meta_cols, data_cols, id='Image_Metadata_WellID',
     data[score] = []
     data['count'] = []
     data['index'] = []
-    for i, wid in enumerate(df[id].unique().tolist()):
-        temp = df.loc[df[id]==wid]
+    for i, wid in enumerate(df[well_id].unique().tolist()):
+        temp = df.loc[df[well_id]==wid]
         for c in meta_cols:
             data[c].append(temp[c].unique()[0])
         for c in data_cols:
