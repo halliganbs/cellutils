@@ -1,6 +1,6 @@
 import os
 import re
-
+import pickle
 import numpy as np
 import pandas as pd
 
@@ -62,3 +62,24 @@ def make_well(df:pd.DataFrame, meta_cols, data_cols, well_id='Image_Metadata_Wel
     well = pd.DataFrame(data=data)
     print(well.shape)
     return well
+
+def get_data_cols(df:pd.DataFrame, extra=[""], save=False, fname='data_cols'):
+    """_summary_
+
+    Args:
+        df (pd.DataFrame): _description_
+        extra (list, optional): _description_. Defaults to [""].
+        save (bool, optional): _description_. Defaults to False.
+        fname (str, optional): _description_. Defaults to 'data_cols'.
+
+    Returns:
+        _type_: _description_
+    """
+    LOC_COLS = "Location|Center|Children|Parent"
+    pattern = "|".join([LOC_COLS, extra])
+    meta_cols = df.columns[df.columns.str.contains(pat=pattern)].tolist()
+    data_cols = df.drop(columns=meta_cols).select_dtypes(include='float64').columns.tolist()
+    if save:
+        with open(fname, 'wb') as f:
+            pickle.dump(data_cols, f)
+    return data_cols
