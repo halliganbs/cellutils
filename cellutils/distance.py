@@ -39,12 +39,20 @@ def mahalanobis(df:pd.DataFrame, data_cols, n_pcas=30, cov=None):
         data_cols (list-like): list of relevant measurement columns
         n_pcas (int, optional): number of PCAs. Defaults to 30.
     """
-    pcas = PCA(n_components=n_pcas).fit_transform(df[data_cols])
-    rows, _ = pcas.shape
-    y_mu = df - np.mean(df[data_cols]) 
-    if not cov:
-        cov = np.cov(df[data_cols].values.T) 
-    inv_covmat = np.linalg.inv(cov)
-    left = np.dot(y_mu, inv_covmat)
-    mahal = np.dot(left, y_mu.T)
-    return mahal.diagonal()
+    # pcas = PCA(n_components=n_pcas).fit_transform(df[data_cols])
+    # rows, _ = pcas.shape
+    # y_mu = df - np.mean(df[data_cols]) 
+    # if not cov:
+    #     cov = np.cov(df[data_cols].values.T) 
+    # inv_covmat = np.linalg.inv(cov)
+    # left = np.dot(y_mu, inv_covmat)
+    # mahal = np.dot(left, y_mu.T)
+    # return mahal.diagonal()
+    rows = df[data_cols].shape
+    x0 = np.zeros(len(data_cols))
+    covariance = np.array(df[data_cols].values)
+    mahal_dist = []
+    for _, row  in df.iterrows():
+        mahal = distance.mahalanobis(x0, row[data_cols], np.linalg.inv(covariance))
+        mahal_dist.append(mahal)
+    return mahal_dist
