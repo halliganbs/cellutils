@@ -36,7 +36,7 @@ def make_well(df:pd.DataFrame, meta_cols, data_cols, well_id='Image_Metadata_Wel
     Convert Cell level scored data into well level means
 
     Args:
-        df (pd.DataFrame): cell lvel data
+        df (pd.DataFrame): cell level data
         meta_cols (list like): List-like of metadata columns
         data_cols (list like): List-like of data columns used in scoring
         id (str, optional): Well ID. Defaults to 'Image_Metadata_WellID'.
