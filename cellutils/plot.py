@@ -47,4 +47,6 @@ def plot_plate(df:pd.DataFrame,
         plt.savefig(img_name, format='png', bbox_inches="tight")
     print(pnts[wellid].unique())
     if save_hits:
-        pnts.to_csv(hits_name, index=False) 
+        pnts.to_csv(hits_name, index=False)
+
+    return pnts 
