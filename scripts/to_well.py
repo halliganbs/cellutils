@@ -14,6 +14,11 @@ from .logger import logger
 from progress.bar import Bar
 import click
 
+@click.command()
+@click.argument("indir")
+@click.argument("outdir")
+@click.option("--data", "-d", default=[], required=False, help="Data column pickle file")
+@click.option("--meta", "-m", default=[], required=False, help="Metadata pickle file")
 def mass_well(indir, outdir, data, meta, exten):
     if os.name == 'nt':
         os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
@@ -28,10 +33,12 @@ def mass_well(indir, outdir, data, meta, exten):
     files = glob.glob(indir+"/*")
     assert len(files) > 0, 'No files found...'
     
-    with open(data, 'rb') as f:
-        data_cols = pickle.load(f)
-    with open(meta, 'rb') as f:
-        meta_cols = pickle.load(f)
+    if data.type is not list:
+        with open(data, 'rb') as f:
+            data_cols = pickle.load(f)
+    if meta.type is not list:
+        with open(meta, 'rb') as f:
+            meta_cols = pickle.load(f)
     
     logger(outdir, locals())
     
