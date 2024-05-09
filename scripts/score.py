@@ -10,7 +10,6 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from xgboost  import XGBRegressor
 
-from cellutils.utils import make_well
 from .logger import logger
 
 @click.command()
