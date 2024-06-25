@@ -83,3 +83,53 @@ def get_data_cols(df:pd.DataFrame, extra=[""], save=False, fname='data_cols'):
         with open(fname, 'wb') as f:
             pickle.dump(data_cols, f)
     return data_cols
+
+def char_range(c1, c2):
+    """
+    Provide a range over letters, e.g. A P gives letters ABCDEFGHIJKLMNOP
+    Args:
+        c1 (str): start letter
+        c2 (str): end letter
+    """
+    for c in range(ord(c1), ord(c2)+1):
+        yield(chr(c))
+
+def add_controls(df:pd.DataFrame, rows=('A', 'P'), nc_cols=(1, 2), pc_cols=(23,24), pc_val='Test', nc_val='DMSO', well_id='wellid', cmpd_col='Compound', extra_cols={}, test=False):
+    """
+    Adds Rows for controls, typically when HPD300 is used for controls and echo for compounds
+    Args:
+        df (pd.DataFrame): Source dataframe
+        rows (tuple, optional): Letter row ids . Defaults to ('A', 'P').
+        pc_cols (tuple, optional): start and end cols . Defaults to (1, 2).
+        nc_cols (tuple, optional): _description_. Defaults to (23,24).
+        pc_val (str, optional): _description_. Defaults to 'Test'.
+        nc_val (str, optional): _description_. Defaults to 'DMSO'.
+        well_id (str, optional): _description_. Defaults to 'wellid'.
+        cmpd_col (str, optional): _description_. Defaults to 'Compound'.
+        extra_cols (dict, optional): _description_. Defaults to {}.
+
+    Returns:
+        _type_: _description_
+    """
+    _, scr_cols = df.shape
+    data = {c:[] for c in df.columns.tolist()}
+    for c in char_range(rows[0], rows[1]):
+        for i in range(pc_cols[0], pc_cols[1]+1):
+            name = c+str(i).zfill(2)
+            data[well_id].append(name)
+            data[cmpd_col].append(pc_val)
+            for k in extra_cols.keys():
+                data[k].append(extra_cols[k])
+        for i in range(nc_cols[0], nc_cols[1]+1):
+            name = c+str(i).zfill(2)
+            data[well_id].append(name)
+            data[cmpd_col].append(nc_val)
+            for k in extra_cols.keys():
+                data[k].append(extra_cols[k])
+    if test:
+        for k in data.keys():
+            print(k, len(data[k]))
+    dt = pd.DataFrame(data=data)
+    _, out_cols = dt.shape
+    assert scr_cols==out_cols, "Number of Columns do not match"
+    return pd.concat([df, dt])
