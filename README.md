@@ -1,6 +1,18 @@
 # cellutils
 Utility functions for High throughput microscopy machine learning pipelines
 
+## Installation
+
+TODO:include `requirements.txt` file
+
+```
+git clone git@github.com:halliganbs/cellutils.git
+
+cd cellutils
+
+pip install .
+```
+
 ## Utils
 
 - `make_well` - Converts Object level measurements to well level means
