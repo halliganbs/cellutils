@@ -25,5 +25,12 @@ setup(
     author='halliganbs',
     author_email='bhalliga@med.umich.edu',
     license='MIT',
-    packages=['cellutils']
+    packages=['cellutils'],
+    entry_points ={
+        'console_scripts': [
+            'score-plate=scripts.score:score_plate',
+            'crop-cells=scripts.single_cell_crops:get_crops',
+            'to-well=scripts.to_well:mass_well',
+        ]
+    }
 )
