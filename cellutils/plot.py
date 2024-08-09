@@ -10,7 +10,7 @@ import seaborn as sns
 def plot_plate(df:pd.DataFrame, 
                cond="COND", index='index', score='score', count=None, wellid='Image_Metadat_WellID',
                cutoff=None, data_cols=[], title='well plot',save_img=False,img_name='my_plot.png', 
-               save_hits=False, hits_name='my_hits.csv', ):
+               save_hits=False, hits_name='my_hits.csv', cmpd='CMPD'):
     """
     Plot a 384 well plate's scores, coloring on compounds and contorls
     Args:
@@ -28,11 +28,12 @@ def plot_plate(df:pd.DataFrame,
         save_hits (bool, optional): save hits csv Defaults to False.
         hits_name (str, optional): name of hits file Defaults to 'my_hits.csv'.
     """
-    std = df.loc[df['COND']=='CMPD', 'score'].std()
-    mean = df.loc[df['COND']=='CMPD', 'score'].mean()
+    cols = [index,wellid]
+    std = df.loc[df[cond]==cmpd, score].std()
+    mean = df.loc[df[cond]==cmpd, score].mean()
     if cutoff is None:
         cutoff = mean + (3*std)
-    pnts = df.loc[(df[score]>=cutoff)&(df[cond]=='CMPD'), data_cols]
+    pnts = df.loc[(df[score]>=cutoff)&(df[cond]==cmpd), data_cols+cols]
 
     ax = sns.scatterplot(data=df, x=index, y=score, size=count, hue=cond)
     plt.axhline(y=cutoff, c='r')
