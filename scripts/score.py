@@ -41,13 +41,11 @@ def score_plate(db, colname,  modelname, table, fname, log):
     query = f"SELECT * FROM {table}"
     dfs = []
     for chunk in pd.read_sql_query(query, con, chunksize=int(1e6)):
-        print(f"Read chunk with size of: {len(chunk)} rows")
+        print(f"Scoring chunk with size of: {len(chunk)} rows")
         dfs.append(chunk)
+        data = StandardScaler().fit_transform(chunk[data_cols])
+        chunk['score'] = model.predict(data)
         del chunk
-    df = pd.concat(dfs)
-    
-    print("Scoring...")
-    data = StandardScaler().fit_transform(df[data_cols])
-    df['score'] = model.predict(data)
+    df = pd.concat(dfs)    
     df.to_csv(fname+".csv", index=False)
     
