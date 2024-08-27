@@ -69,7 +69,16 @@ def find_diameter(mask_path, object_number):
     return None
  
 # Filter cells based on their diameter (remove false masks)
-def filter_cells(df, min_diameter=100, wellid='Image_Metadata_WellID', field='Image_Metadata_Field', obj_num_col='ObjectNumber'):
+def filter_cells(df, maskpath, min_diameter=100, wellid='Image_Metadata_WellID', field='Image_Metadata_Field', obj_num_col='ObjectNumber',
+                 mask_names = {
+        'plate_type':"PECCU",
+        'timepoint':"T0001",
+        'location':'L01',
+        'wid':'A03',
+        'zstack':'Z01',
+        'channel':'C03',
+    },
+                 ):
     filtered_rows = []
     
     for index, row in df.iterrows():
@@ -81,8 +90,8 @@ def filter_cells(df, min_diameter=100, wellid='Image_Metadata_WellID', field='Im
         field_id_formatted = f"F{field_id}"
         
         # Get the mask path, adjusting for A03 in the path
-        mask_path = f"Y:/CV8000/Sophia/BIS009_20240701_102850/masks/PECCU_{well_id}_T0001{field_id_formatted}L01A03Z01C03.tif" #change to your mask path
-        
+        mask_name = f"{mask_names['plate_type']}_{well_id}_{mask_names['timepoint']}{field_id_formatted}{mask_names['location']}{mask_names['wid']}{mask_names['zstack']}{mask_names['channel']}.tif"
+        mask_path = os.path.join(maskpath, mask_name)
         diameter = find_diameter(mask_path, object_number)
         if diameter and diameter > min_diameter:
             filtered_rows.append(row)
