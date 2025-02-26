@@ -50,4 +50,31 @@ def plot_plate(df:pd.DataFrame,
     if save_hits:
         pnts.to_csv(hits_name, index=False)
 
-    return pnts 
+    return pnts
+
+def plot_reg_facet(df:pd.DataFrame, x='concentration', y='count', 
+                   x_size=4, y_size=4, cmpd_col='Compound', 
+                   plot_name='my_cool_plot',xlabel='Log Concentration', ylabel='Percent Viabilty'):
+    """
+    plot_reg_facet
+    Plots a facet grid of regression plots
+    """ 
+    cmpds = df[cmpd_col].unique().tolist()
+    fig, ax = plt.subplots(x_size, y_size, sharex=True, sharey=True)
+    fig.set_figheight(30)
+    fig.set_figwidth(30)
+    
+    idx = 0
+    
+    for row in range(0, x_size):
+        for col in range(0, y_size):
+            if idx > len(cmpds)-1:
+                break
+            c = cmpds[idx]
+            sns.regplot(ax=ax[row, col], x=x, y=y, data=df.loc[df[cmpd_col]==c])
+            ax[row,col].set_title(c, fontsize=15, fontweight="bold")
+            ax[row,col].set_xlabel(xlabel)
+            ax[row,col].set_ylabel(ylabel)
+            idx+=1
+    
+    plt.savefig(f"{plot_name}_regression.svg", format='SVG', dpi=2000)
