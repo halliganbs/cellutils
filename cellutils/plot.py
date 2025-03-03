@@ -7,6 +7,9 @@ import pandas  as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from synergy.combination.bliss import Bliss
+from synergy.utils.plots import aggregate_replicates, is_on_grid
+
 def plot_plate(df:pd.DataFrame, 
                cond="COND", index='index', score='score', count=None, wellid='Image_Metadat_WellID',
                cutoff=None, data_cols=[], title='well plot',save_img=False,img_name='my_plot.png', 
@@ -78,3 +81,43 @@ def plot_reg_facet(df:pd.DataFrame, x='concentration', y='count',
             idx+=1
     
     plt.savefig(f"{plot_name}_regression.svg", format='SVG', dpi=2000)
+    
+def synergy_plot(df, drugs, cell_line, agaisnt, bliss=False, output_dir=''):
+    for dr in drugs:
+        print(cell_line, dr)
+        a = df.loc[df['Drug1']==dr]
+        title = f'{agaisnt} vs {dr}'
+        xlabel = agaisnt
+        d1 = np.array(a['Conc1'].values, copy=True, dtype=np.float64)
+        d2 = np.array(a['Conc2'].values, copy=True, dtype=np.float64)
+        vals = np.array(df['score'].values, copy=True, dtype=np.float64)
+        
+        if bliss:
+            model = Bliss()
+            vals = model.fit(d1,d2, vals)
+        
+        sorted_indices = np.lexsort((d1,d2))
+        D1 = d1[sorted_indices]
+        D2 = d2[sorted_indices]
+        vals = vals[sorted_indices]
+        D_unique, vals = aggregate_replicates(np.vstack((D1,D2)).T, vals, aggfunc=np.median)
+        if not is_on_grid(D_unique):
+            raise ValueError("plot_surface_plotly() requires d1, d2 to represent a dose grid")
+        D1 = D_unique[:, 0]
+        D2 = D_unique[:, 1]
+        dy = pd.DataFrame(data={
+            'conc1':D_unique[:,0],
+            'conc2':D_unique[:,1],
+            'response':vals
+        })
+        df_p = dy.pivot(index='conc1', columns='conc2', values='response')
+        ax = sns.heatmap(data=df_p, annot=True,fmt='.2f')
+        ax.set(xlabel=xlabel,ylabel=dr, title=title)
+        ax.invert_yaxis()
+        if bliss:
+            fname = os.path.join(output_dir, f"bliss_{cell_line}_{dr}.svg")
+        else:
+            fname = os.path.join(output_dir, f"{cell_line}_{dr}.svg")
+        fig = ax.get_figure()
+        plt.savefig(fname, format='SVG')
+        plt.clf()
