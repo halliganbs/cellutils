@@ -31,3 +31,9 @@ pip install .
 ## Plotting
 
 - `plot_plate` - Plots well level plate
+- `plot_reg_facet` - Plots facet grid of regression plots
+- `synergy_plot` - Plots synergy score plot with option Bliss Synergy
+
+## Score
+
+- `score_plate` - Scores a database file using a provided model and column names
