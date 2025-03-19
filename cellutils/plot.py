@@ -90,7 +90,7 @@ def synergy_plot(df, drugs, cell_line, agaisnt, bliss=False, output_dir=''):
         xlabel = agaisnt
         d1 = np.array(a['Conc1'].values, copy=True, dtype=np.float64)
         d2 = np.array(a['Conc2'].values, copy=True, dtype=np.float64)
-        vals = np.array(df['score'].values, copy=True, dtype=np.float64)
+        vals = np.array(a['score'].values, copy=True, dtype=np.float64)
         
         if bliss:
             model = Bliss()
