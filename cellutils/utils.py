@@ -133,3 +133,52 @@ def add_controls(df:pd.DataFrame, rows=('A', 'P'), nc_cols=(1, 2), pc_cols=(23,2
     _, out_cols = dt.shape
     assert scr_cols==out_cols, "Number of Columns do not match"
     return pd.concat([df, dt])
+
+def synergy_convert(df, drug2, drugs, make_dmso=False):
+    """_summary_
+
+    Args:
+        df (pandas DataFrame): Dataframe with columns WellID, Cell_Line, Compound, Concentration, Cells, Viability
+        drug2 (String): Drug 2 to compare against
+        drugs (list of Strings): Drug1 drug lists
+        make_dmso (bool, optional): Adds zero-zero concentration rows. Defaults to False.
+
+    Returns:
+        DataFrame: New synergy dataframe
+    """
+    df['Concentration'] = round(df['Concentration'], 3)
+    df['score'] = 100 - df['Viability']
+    
+    a = df.loc[df['Compound']!=drug2]
+    b = df.loc[df['Compound']==drug2]
+    
+    a['Drug1'] = a['Compound']
+    a['Conc1'] = a['Concentration']
+    b['Drug2'] = b['Compound']
+    b['Conc2'] = b['Concentration']
+
+    a = a[['WellID', 'Cell_Line', 'Cells','Viability', 'score', 'Drug1', 'Conc1']]
+    b = b[['WellID', 'Cell_Line', 'Cells','Viability', 'score', 'Drug2', 'Conc2']]
+    
+    dt = pd.merge(a,b, on=['WellID', 'Cell_Line', 'Cells','Viability', 'score'], how='outer')
+    
+    dt['Drug2'] = drug2
+    dt['Conc1'].fillna(value=0.0, inplace=True)
+    dt['Conc2'].fillna(value=0.0, inplace=True)
+    
+    idx = dt[dt['Drug1'].isna()].sort_values(by=['Conc1', 'Conc2']).index.tolist()
+    step = 0
+    for i in idx:
+        dt['Drug1'].iloc[i]=drugs[step]
+        step+=1
+        if step >= 3:
+            step=0
+    
+    if make_dmso:
+        dmso = {
+            
+        }
+        dmso = pd.DataFrame(data=dmso)
+        dt = pd.concat([dt,dmso])
+
+    return dt
