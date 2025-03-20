@@ -174,9 +174,18 @@ def synergy_convert(df, drug2, drugs, make_dmso=False):
         if step >= 3:
             step=0
     
+    drugs_list = []
+    for i in range(3):
+        drugs_list+=drugs
+        
     if make_dmso:
         dmso = {
-            
+            'Viability':[100,100,100,100,100,100,100,100,100],
+            'score':[0,0,0,0,0,0,0,0,0],
+            'Drug1':drugs_list,
+            'Conc1':[0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0],
+            'Drug2':[drug2 for _ in range(9)],
+            'Conc2':[0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0,0.0]
         }
         dmso = pd.DataFrame(data=dmso)
         dt = pd.concat([dt,dmso])
