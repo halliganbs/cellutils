@@ -22,6 +22,8 @@ pip install .
 - `get_data_cols` - Sorts out measurement columns
 - `char_range` - Generates a letters in an iterable range
 - `add_controls` - Adds control rows to platemap file
+- `synergy_convert` - Converts HPD300 despense platemap/viability score into synergy format for processing
+- `find_number_components` - Calculates optimal number of components needed to meet provided variance threshold (defaults to 90%)
 
 ## Distance
 

@@ -4,6 +4,9 @@ import pickle
 import numpy as np
 import pandas as pd
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
 def zpad(df:pd.DataFrame, wellid:str):
     """
     Fix zpadding in well ids e.g. A1 => A01
@@ -191,3 +194,23 @@ def synergy_convert(df, drug2, drugs, make_dmso=False):
         dt = pd.concat([dt,dmso])
 
     return dt
+
+def find_number_components(df, data_cols, variance_threshold=0.9):
+    """
+    Finds the number of components needed for greater than variance threshold
+
+    Args:
+        df (pd:DataFrame): Dataframe of data
+        data_cols (list<str>): Relevant data columns (excluding metadata, location, etc.)
+        variance_threshold (float, optional): Standard variance threshold. Defaults to 0.9.
+
+    Returns:
+        int: Optimal number of Principal Compents 
+    """
+    scaler = StandardScaler()
+    df_scaled = scaler.fit_transform(df[data_cols])
+    pca = PCA()
+    _ = pca.fit_transform(df_scaled)
+    num_components = np.where(np.cumsum(pca.explained_variance_ratio_)>=variance_threshold)[0][0]
+    print(f"{variance_threshold} found after {num_components} Components...")
+    return num_components
