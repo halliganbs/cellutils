@@ -214,3 +214,16 @@ def find_number_components(df, data_cols, variance_threshold=0.9):
     num_components = np.where(np.cumsum(pca.explained_variance_ratio_)>=variance_threshold)[0][0]
     print(f"{variance_threshold} found after {num_components} Components...")
     return num_components
+
+def well_id_fix(df, well_id='WellID'):
+    """
+    Fixes Well IDs in order to match across the scopes
+    Args:
+        df (pd.DataFrame): original DataFrame
+        well_id (str, optional): source well id column name. Defaults to 'WellID'.
+    Returns:
+        pd.DataFrame: newly merged dataframe
+    """
+    dt = pd.read_csv("CQ1_WellIDsFix.csv")
+    df = pd.merge(df, dt, left_on=well_id, right_on='WellID')
+    return df
