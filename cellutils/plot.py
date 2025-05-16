@@ -7,8 +7,33 @@ import pandas  as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from synergy.combination.bliss import Bliss
+from synergy.combination.bliss import Bliss # bliss
+from synergy.combination.braid import BRAID # braid_kappa braid_delta braid_both
+from synergy.combination.combination_index import CombinationIndex # combo
+from synergy.combination.hsa import HSA # hsa
+from synergy.combination.loewe import Loewe # loewe
+from synergy.combination.musyc import MuSyC # musyc
+from synergy.combination.schindler import Schindler # schindler
+from synergy.combination.zimmer import Zimmer # zimmer
+from synergy.combination.zero_interaction_potency import ZIP # zip
+from synergy.single.hill import Hill
+
 from synergy.utils.plots import aggregate_replicates, is_on_grid
+
+ALGOS = {
+    'bliss':Bliss(), # use
+    'braid_kappa':BRAID(mode='kappa'), # maybe
+    'braid_delta':BRAID(mode='delta'),
+    'braid_both':BRAID(mode='both'),
+    'combo': CombinationIndex(), # use
+    'hsa':HSA(), # use
+    'loewe':Loewe(mode="ci", drug1_model=Hill, drug2_model=Hill), # maybe
+    'musyc':MuSyC(), # avoid using
+    'schindler':Schindler(), # use
+    'zimmer':Zimmer(), # maybe
+    'zip':ZIP() # use
+}
+
 
 def plot_plate(df:pd.DataFrame, 
                cond="COND", index='index', score='score', count=None, wellid='Image_Metadat_WellID',
@@ -82,7 +107,8 @@ def plot_reg_facet(df:pd.DataFrame, x='concentration', y='count',
     
     plt.savefig(f"{plot_name}_regression.svg", format='SVG', dpi=2000)
     
-def synergy_plot(df, drugs, cell_line, agaisnt, bliss=False, output_dir=''):
+def synergy_plot(df, drugs, cell_line, agaisnt, on='score', algo=None, output_dir=''):
+    assert algo is None or algo in ALGOS.keys(), f"ALGO not found use: {ALGOS.keys()}"
     for dr in drugs:
         print(cell_line, dr)
         a = df.loc[df['Drug1']==dr]
@@ -90,10 +116,10 @@ def synergy_plot(df, drugs, cell_line, agaisnt, bliss=False, output_dir=''):
         xlabel = agaisnt
         d1 = np.array(a['Conc1'].values, copy=True, dtype=np.float64)
         d2 = np.array(a['Conc2'].values, copy=True, dtype=np.float64)
-        vals = np.array(a['score'].values, copy=True, dtype=np.float64)
+        vals = np.array(a[on].values, copy=True, dtype=np.float64)
         
-        if bliss:
-            model = Bliss()
+        if algo is not None:
+            model = ALGOS[algo]
             vals = model.fit(d1,d2, vals)
         
         sorted_indices = np.lexsort((d1,d2))
@@ -111,13 +137,13 @@ def synergy_plot(df, drugs, cell_line, agaisnt, bliss=False, output_dir=''):
             'response':vals
         })
         df_p = dy.pivot(index='conc1', columns='conc2', values='response')
-        ax = sns.heatmap(data=df_p, annot=True,fmt='.2f')
+        ax = sns.heatmap(data=df_p, annot=True,fmt='.0f')
         ax.set(xlabel=xlabel,ylabel=dr, title=title)
         ax.invert_yaxis()
-        if bliss:
-            fname = os.path.join(output_dir, f"bliss_{cell_line}_{dr}.svg")
+        if algo is not None:
+            fname = os.path.join(output_dir, f"{algo}_{on}_{cell_line}_{dr}.svg")
         else:
-            fname = os.path.join(output_dir, f"{cell_line}_{dr}.svg")
+            fname = os.path.join(output_dir, f"{cell_line}_{on}_{dr}.svg")
         fig = ax.get_figure()
         plt.savefig(fname, format='SVG')
         plt.clf()
