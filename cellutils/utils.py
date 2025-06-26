@@ -79,7 +79,7 @@ def get_data_cols(df:pd.DataFrame, extra=[""], save=False, fname='data_cols'):
         _type_: _description_
     """
     LOC_COLS = "Location|Center|Children|Parent"
-    pattern = "|".join([LOC_COLS, extra])
+    pattern = "|".join([LOC_COLS]+extra)
     meta_cols = df.columns[df.columns.str.contains(pat=pattern)].tolist()
     data_cols = df.drop(columns=meta_cols).select_dtypes(include='float64').columns.tolist()
     if save:
@@ -227,3 +227,24 @@ def well_id_fix(df, well_id='WellID'):
     dt = pd.read_csv("CQ1_WellIDsFix.csv")
     df = pd.merge(df, dt, left_on=well_id, right_on='WellID')
     return df
+
+def get_mode_hits(df:pd.DataFrame, score_col:str, well_col='Image_MetaData_WellID'):
+    """
+    Gets mode of classification score of cell level data
+    Args:
+        df (pd.DataFrame): scored cell level data dataframe
+        score_col (str): column of classification score
+        well_col (str, optional): Well ID column. Defaults to 'Image_MetaData_WellID'.
+
+    Returns:
+        pd.DataFrame: Well level hits consisting of Well ID and mode of classification score
+    """
+    data = {
+        'wellID':[],
+        score_col:[]
+    }
+    for wid in df[well_col].unique():
+        temp = df.loc[df[well_col]==wid, ]
+        data['wellID'].append(wid)
+        data[score_col].append(temp[well_col].mode()[0]) # might need to remove that
+    return pd.DataFrame(data=data)
