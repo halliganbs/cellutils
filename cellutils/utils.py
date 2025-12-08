@@ -78,7 +78,7 @@ def get_data_cols(df:pd.DataFrame, extra=[""], save=False, fname='data_cols'):
     Returns:
         _type_: _description_
     """
-    LOC_COLS = "Location|Center|Children|Parent"
+    LOC_COLS = "Location|Center|Children|Parent|Object_Number"
     pattern = "|".join([LOC_COLS]+extra)
     meta_cols = df.columns[df.columns.str.contains(pat=pattern)].tolist()
     data_cols = df.drop(columns=meta_cols).select_dtypes(include='float64').columns.tolist()
