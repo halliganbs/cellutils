@@ -31,7 +31,8 @@ def plate_level(df, plate_id='Metadata_PlateID'):
             profilers=temp,
             features=data_cols,
             meta_features=meta_cols,
-            samples=NEG_CONTROL_QUERY # to change later for metadata reasons
+            samples=NEG_CONTROL_QUERY # to change later for metadata reasons, 
+            method="mad_robustize" # Recommended fit-for-purpose default to avoid user-error, 
         )
         dfs.append(norm_plate)
     plate_norm = pd.concat(dfs)
