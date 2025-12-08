@@ -85,7 +85,7 @@ def get_data_cols(df:pd.DataFrame, extra=[""], save=False, fname='data_cols'):
     if save:
         with open(fname, 'wb') as f:
             pickle.dump(data_cols, f)
-    return data_cols
+    return meta_cols, data_cols
 
 def char_range(c1, c2):
     """
