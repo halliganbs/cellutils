@@ -13,6 +13,7 @@ from tqdm import tqdm
 from .utils import get_data_cols
 
 import click
+from dmso_qc_module import DMSO_QC
 
 NEG_CONTROL_QUERY = 'Metadata_Compound == DMSO"'
 
@@ -140,9 +141,33 @@ def spherize(df, data_cols, neg_control_query='Metadata_COMPOUND == "DMSO"'):
     
     return sphere
 
-def DMSO_QC(df):
-    print("DO THE DMSO CORRECTION THING HERE")
-    return df
+def DMSO_QC(df, encode_condition=True, n_dmso_replicates=3, skip_dmso_filter=False):
+    """
+    Perform DMSO quality control and metadata standardization.
+    
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input dataframe
+    encode_condition : bool
+        Add binary encoding (default: True)
+    n_dmso_replicates : int
+        Replicates to keep per donor (default: 3)
+    skip_dmso_filter : bool
+        Skip filtering step (default: False)
+    """
+    import logging
+    from dmso_qc_module import DMSO_QC as _DMSO_QC
+    
+    # Set up logging if not already configured
+    if not logging.getLogger().handlers:
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+    
+    return _DMSO_QC(df, encode_condition, n_dmso_replicates, skip_dmso_filter)
+
 
 @click.command()
 @click.argument('src')
